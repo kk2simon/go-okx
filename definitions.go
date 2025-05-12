@@ -5,6 +5,7 @@ package okex
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -42,7 +43,7 @@ type (
 
 	Destination           int
 	BillType              uint8
-	BillSubType           uint8
+	BillSubType           uint16
 	FeeCategory           uint8
 	TransferType          uint8
 	AccountType           uint8
@@ -304,6 +305,10 @@ const (
 
 func (t *JSONTime) String() string { return (time.Time)(*t).String() }
 
+func (t *JSONTime) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%d"`, time.Time(*t).UnixMilli())), nil
+}
+
 func (t *JSONTime) UnmarshalJSON(s []byte) (err error) {
 	r := strings.Replace(string(s), `"`, ``, -1)
 	if r == "" {
@@ -375,11 +380,11 @@ func (t *BillSubType) UnmarshalJSON(s []byte) (err error) {
 		return
 	}
 
-	q, err := strconv.ParseUint(r, 10, 8)
+	q, err := strconv.ParseUint(r, 10, 16)
 	if err != nil {
 		return err
 	}
-	*(*uint8)(t) = uint8(q)
+	*(*uint16)(t) = uint16(q)
 	return
 }
 func (t *FeeCategory) UnmarshalJSON(s []byte) (err error) {

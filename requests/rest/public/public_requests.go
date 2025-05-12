@@ -1,6 +1,6 @@
 package public
 
-import "github.com/pefish/go-okx"
+import okex "github.com/pefish/go-okx"
 
 type (
 	GetInstruments struct {
@@ -22,6 +22,12 @@ type (
 	}
 	GetFundingRate struct {
 		InstID string `json:"instId"`
+	}
+	GetFundingRateHistory struct {
+		InstID string `json:"instId"` // required
+		After  int64  `json:"after,omitempty,string"`
+		Before int64  `json:"before,omitempty,string"`
+		Limit  int64  `json:"limit,omitempty,string"`
 	}
 	GetLimitPrice struct {
 		InstID string `json:"instId"`

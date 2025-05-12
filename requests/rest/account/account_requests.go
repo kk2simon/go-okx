@@ -20,11 +20,12 @@ type (
 		EndTime  int64 `json:"t,omitempty,string"`
 	}
 	GetBills struct {
+		InstType okex.InstrumentType `json:"instType,omitempty"`
+		InstId   string              `json:"instId,omitempty"`
 		Ccy      string              `json:"ccy,omitempty"`
 		After    int64               `json:"after,omitempty,string"`
 		Before   int64               `json:"before,omitempty,string"`
 		Limit    int64               `json:"limit,omitempty,string"`
-		InstType okex.InstrumentType `json:"instType,omitempty"`
 		MgnMode  okex.MarginMode     `json:"mgnMode,omitempty"`
 		CtType   okex.ContractType   `json:"ctType,omitempty"`
 		Type     okex.BillType       `json:"type,omitempty,string"`

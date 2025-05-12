@@ -1,7 +1,7 @@
 package publicdata
 
 import (
-	"github.com/pefish/go-okx"
+	okex "github.com/pefish/go-okx"
 )
 
 type (
@@ -49,10 +49,29 @@ type (
 	FundingRate struct {
 		InstID          string              `json:"instId"`
 		InstType        okex.InstrumentType `json:"instType"`
+		FormulaType     string              `json:"formulaType"`
 		FundingRate     okex.JSONFloat64    `json:"fundingRate"`
-		NextFundingRate okex.JSONFloat64    `json:"NextFundingRate"`
+		NextFundingRate okex.JSONFloat64    `json:"nextFundingRate"`
 		FundingTime     okex.JSONTime       `json:"fundingTime"`
 		NextFundingTime okex.JSONTime       `json:"nextFundingTime"`
+		ImpactValue     string              `json:"impactValue"`
+		InterestRate    string              `json:"interestRate"`
+		MaxFundingRate  okex.JSONFloat64    `json:"maxFundingRate"`
+		MinFundingRate  okex.JSONFloat64    `json:"minFundingRate"`
+		Method          string              `json:"method"`
+		Premium         okex.JSONFloat64    `json:"premium"`
+		SettFundingRate okex.JSONFloat64    `json:"settFundingRate"`
+		SettState       string              `json:"settState"`
+		TS              okex.JSONTime       `json:"ts"`
+	}
+	FundingRateHistory struct {
+		FormulaType  string              `json:"formulaType"`
+		FundingRate  okex.JSONFloat64    `json:"fundingRate"`
+		FundingTime  okex.JSONTime       `json:"fundingTime"`
+		InstID       string              `json:"instId"`
+		InstType     okex.InstrumentType `json:"instType"`
+		Method       string              `json:"method"`
+		RealizedRate okex.JSONFloat64    `json:"realizedRate"`
 	}
 	LimitPrice struct {
 		InstID   string              `json:"instId"`

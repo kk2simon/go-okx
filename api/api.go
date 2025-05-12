@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 
-	i_logger "github.com/pefish/go-interface/i-logger"
 	okex "github.com/pefish/go-okx"
 	"github.com/pefish/go-okx/api/rest"
 	"github.com/pefish/go-okx/api/ws"
@@ -11,16 +10,14 @@ import (
 
 // Client is the main api wrapper of okex
 type Client struct {
-	Rest   *rest.ClientRest
-	Ws     *ws.ClientWs
-	ctx    context.Context
-	logger i_logger.ILogger
+	Rest *rest.ClientRest
+	Ws   *ws.ClientWs
+	ctx  context.Context
 }
 
 // NewClient returns a pointer to a fresh Client
 func NewClient(
 	ctx context.Context,
-	logger i_logger.ILogger,
 	apiKey,
 	secretKey,
 	passphrase string,
@@ -44,13 +41,12 @@ func NewClient(
 		wsPriURL = okex.AwsPrivateWsURL
 	}
 
-	r := rest.NewClient(logger, apiKey, secretKey, passphrase, restURL, destination)
-	c := ws.NewClient(ctx, logger, apiKey, secretKey, passphrase, map[bool]okex.BaseURL{true: wsPriURL, false: wsPubURL})
+	r := rest.NewClient(apiKey, secretKey, passphrase, restURL, destination)
+	c := ws.NewClient(ctx, apiKey, secretKey, passphrase, map[bool]okex.BaseURL{true: wsPriURL, false: wsPubURL})
 
 	return &Client{
-		Rest:   r,
-		Ws:     c,
-		ctx:    ctx,
-		logger: logger,
+		Rest: r,
+		Ws:   c,
+		ctx:  ctx,
 	}, nil
 }

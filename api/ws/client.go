@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	i_logger "github.com/pefish/go-interface/i-logger"
 	okex "github.com/pefish/go-okx"
 	"github.com/pefish/go-okx/events"
 	"github.com/pkg/errors"
@@ -37,7 +36,6 @@ type ClientWs struct {
 	Public        *Public
 	Trade         *Trade
 	ctx           context.Context
-	logger        i_logger.ILogger
 }
 
 const (
@@ -50,7 +48,6 @@ const (
 // NewClient returns a pointer to a fresh ClientWs
 func NewClient(
 	ctx context.Context,
-	logger i_logger.ILogger,
 	apiKey,
 	secretKey,
 	passphrase string,
@@ -58,7 +55,6 @@ func NewClient(
 ) *ClientWs {
 	ctx, cancel := context.WithCancel(ctx)
 	c := &ClientWs{
-		logger:     logger,
 		apiKey:     apiKey,
 		secretKey:  []byte(secretKey),
 		passphrase: passphrase,
@@ -156,14 +152,14 @@ func (c *ClientWs) Send(needLogin bool, op okex.Operation, args []map[string]str
 		for {
 			select {
 			case err := <-sendErrChan:
-				c.logger.ErrorF("<%s> Send error <%+v>, reconnect...\n", string(sendData), err)
+				fmt.Printf("[XERROR] <%s> Send error <%+v>, reconnect...\n", string(sendData), err)
 				err = c.connect(needLogin, senderChan, sendErrChan)
 				if err != nil {
 					time.Sleep(3 * time.Second)
 					sendErrChan <- errors.Errorf("<%s> Connect failed. %+v\n", string(sendData), err)
 					continue
 				}
-				c.logger.InfoF("<%s> Connect success.", string(sendData))
+				fmt.Printf("[XINFO] <%s> Connect success.", string(sendData))
 				senderChan <- sendData
 			case <-c.ctx.Done():
 				return
@@ -209,14 +205,14 @@ func (c *ClientWs) dial(
 	go func() {
 		err := c.receiver(conn)
 		if err != nil {
-			c.logger.ErrorF("Receiver error: %v\n", err)
+			fmt.Printf("[XERROR] Receiver error: %v\n", err)
 		}
 	}()
 	go func() {
 		err := c.sender(conn, senderChan)
 		if err != nil {
 			sendErrChan <- err
-			c.logger.ErrorF("Sender error: %v\n", err)
+			fmt.Printf("[XERROR] Sender error: %v\n", err)
 		}
 	}()
 	return nil

@@ -9,12 +9,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
-	i_logger "github.com/pefish/go-interface/i-logger"
-	t_logger "github.com/pefish/go-interface/t-logger"
 	okex "github.com/pefish/go-okx"
 	requests "github.com/pefish/go-okx/requests/rest/public"
 	responses "github.com/pefish/go-okx/responses/public_data"
@@ -35,12 +34,10 @@ type ClientRest struct {
 	destination okex.Destination
 	baseURL     okex.BaseURL
 	client      *http.Client
-	logger      i_logger.ILogger
 }
 
 // NewClient returns a pointer to a fresh ClientRest
 func NewClient(
-	logger i_logger.ILogger,
 	apiKey,
 	secretKey,
 	passphrase string,
@@ -48,7 +45,6 @@ func NewClient(
 	destination okex.Destination,
 ) *ClientRest {
 	c := &ClientRest{
-		logger:      logger,
 		apiKey:      apiKey,
 		secretKey:   []byte(secretKey),
 		passphrase:  passphrase,
@@ -65,6 +61,8 @@ func NewClient(
 	c.TradeData = NewTradeData(c)
 	return c
 }
+
+var DEBUG = os.Getenv("DEBUG") != ""
 
 // Do the http request to the server
 func (c *ClientRest) Do(method, path string, private bool, params ...map[string]string) (*http.Response, error) {
@@ -120,7 +118,7 @@ func (c *ClientRest) Do(method, path string, private bool, params ...map[string]
 		r.Header.Add("x-simulated-trading", "1")
 	}
 	uuidStr := ""
-	if c.logger.Level() == t_logger.Level_DEBUG {
+	if DEBUG {
 		u, err := uuid.NewUUID()
 		if err != nil {
 			return nil, err
@@ -128,21 +126,21 @@ func (c *ClientRest) Do(method, path string, private bool, params ...map[string]
 		uuidStr = u.String()
 		dump, err := httputil.DumpRequest(r, true)
 		if err != nil {
-			c.logger.DebugF("[go-okx] Error: %#v", err)
+			fmt.Printf("[go-okx] Error: %#v", err)
 		} else {
-			c.logger.DebugF("[go-okx] [%s] HTTP Request: %s", uuidStr, string(dump))
+			fmt.Printf("[go-okx] [%s] HTTP Request: %s", uuidStr, string(dump))
 		}
 	}
 	res, err := c.client.Do(r)
 	if err != nil {
 		return nil, err
 	}
-	if c.logger.Level() == t_logger.Level_DEBUG {
+	if DEBUG {
 		dump, err := httputil.DumpResponse(res, true)
 		if nil != err {
-			c.logger.DebugF("[go-okx] Error: %#v", err)
+			fmt.Printf("[go-okx] Error: %#v", err)
 		} else {
-			c.logger.DebugF("[go-okx] [%s] HTTP Response: %s", uuidStr, string(dump))
+			fmt.Printf("[go-okx] [%s] HTTP Response: %s", uuidStr, string(dump))
 		}
 	}
 	return res, nil

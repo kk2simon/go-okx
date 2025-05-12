@@ -2,10 +2,11 @@ package rest
 
 import (
 	"encoding/json"
-	"github.com/pefish/go-okx"
+	"net/http"
+
+	okex "github.com/pefish/go-okx"
 	requests "github.com/pefish/go-okx/requests/rest/public"
 	responses "github.com/pefish/go-okx/responses/public_data"
-	"net/http"
 )
 
 // PublicData
@@ -22,6 +23,19 @@ func NewPublicData(c *ClientRest) *PublicData {
 
 func (c *PublicData) GetFundingRate(req requests.GetFundingRate) (response responses.GetFundingRate, err error) {
 	p := "/api/v5/public/funding-rate"
+	m := okex.S2M(req)
+	res, err := c.client.Do(http.MethodGet, p, false, m)
+	if err != nil {
+		return
+	}
+	defer res.Body.Close()
+	d := json.NewDecoder(res.Body)
+	err = d.Decode(&response)
+	return
+}
+
+func (c *PublicData) GetFundingRateHistory(req requests.GetFundingRateHistory) (response responses.GetFundingRateHistory, err error) {
+	p := "/api/v5/public/funding-rate-history"
 	m := okex.S2M(req)
 	res, err := c.client.Do(http.MethodGet, p, false, m)
 	if err != nil {
